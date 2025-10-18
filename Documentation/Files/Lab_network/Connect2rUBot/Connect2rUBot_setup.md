@@ -85,7 +85,7 @@ To work on the project (during lab sessions or for homework), each student has t
 
 The setup process is based on a custom Ubuntu22.04 with the ROS2 Humble environment and the needed packages used on the rUBot project.
 
-A speciffic installation is made for the UB custom rUBot model prototypes.
+A speciffic installation is made for the UB custom rUBot mecanum robot and for the commercial LIMO robot.
 
 ### **2.1. Setup the rUBot mecanum**
 
@@ -93,31 +93,57 @@ The UB custom rUBot mecanum custom made robot is based on:
 - Raspberrypi4 computer onboard
 - Custom ROS2 configuration in Ubuntu22.04 server 64bits.
 
-`Local network control`: 
-
-When you power the rUBot mecanum robot, it connects to the wifi local network `Robotics_UB`router.
-
-- Each rUBot has a specific IP address assigned (192.168.1.x4).
-- Each computer has a specific IP address assigned (192.168.1.x5).
-- From your computer, open a terminal on Desktop and clone the Director's github project:
+`Local control`: 
+- Connect to the rUBot with VScode window: Use Remote Explorer extension to open a remote window on rUBot5 (number change for each group) 
+![](./Images/01_Setup/Code_ssh.png)
+- If you find problems to connect, Regenerate the Keys. Type (change with your rUBot IP address)
   ````shell
-  cd /home/ubuntu/Desktop
-  git clone https://github.com/director_github_user/ROS2_rUBot_mecanum_ws.git
+  ssh-keygen -R 192.168.1.54
   ````
-- Open the the project in VScode and verify the .bashrc file has the following lines:
+- Verify you have the file: `clone_student_project.sh` in your `\home\ubuntu` folder. This file is located at: `ROS2_rUBot_mecanum_ws/Documentation/Files/Install_robot/Local_VScode/clone_student_project.sh`
+- In a new terminal on `\home\ubuntu` type:
   ````shell
-  export ROS_DOMAIN_ID=x  #Replace x with your group number
-  export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-  source /opt/ros/humble/setup.bash
-  source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
-  source /home/ubuntu/Desktop/ROS2_rUBot_mecanum_ws/install/setup.bash
-  cd /home/ubuntu/Desktop/ROS2_rUBot_mecanum_ws
+  source clone_student_project.sh
   ````
-- Open a new terminal and verify the working nodes from your rUBot_x:
+  >specify the `Director` github username 
+
+  >This script will make the project clone, compilation and .bashrc configuration (4minutes aprox)
+- Verify the .bashrc file has the DISPLAY environment variable to use graphical tools like Rviz2:
+  ````shell
+  export DISPLAY=192.168.1.65:0.0 #Change with your computer IP address
+  ````
+- Execute `MobaXterm` in your computer to have an Xserver running for graphical tools
+- Execute the bringup:
+  ```bash
+  ros2 launch my_robot_bringup my_robot_bringup_hw.launch.py
+  ```
+- Verify in a new terminal the working nodes:
   ````shell
   ros2 node list
   ````
-  If the four main nodes are running, you are ready to control the robot.
+
+You will see the main nodes running and you are ready to control the robot
+
+### **2.2. Setup the LIMO robot**
+
+The commercial LIMO robot is based on:
+- Jetson Nano computer onboard
+- Custom Dockerfile and docker-compose to create a custom ROS2 Docker container.
+
+When the commercial LIMO robot is plugged on, the docker-compose-v3.yaml service is executed and the LIMO robot is ready to be controlled within the TheConstruct environment.
+
+- `Local control`: Connecting to the LIMO robot with VScode window attached to the container:
+  ````shell
+  ros2 launch limo_bringup limo_start.launch.py
+  ````
+
+- `Remote control`: Using the TheConstruct Real Robot Lab. service
+  - Install the LIMO robot on your account (this is already done for you)
+  - Connect to the robot and type in a new terminal
+    ````shell
+    ros2 node list
+    ````
+  - You will see the main nodes running
 
 ## **3. Update and syncronize the repository project**
 
