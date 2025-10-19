@@ -17,15 +17,14 @@ if lsof -i :9090 > /dev/null; then
   lsof -ti :9090 | xargs kill -9
 fi
 
-# Allibera el port 7000 si està ocupat
-if lsof -i :7000 > /dev/null; then
-  echo "⚠️ El port 7000 està ocupat. Tancant processos anteriors..."
-  lsof -ti :7000 | xargs kill -9
+# Allibera el port 8000 si està ocupat
+if lsof -i :8000 > /dev/null; then
+  echo "⚠️ El port 8000 està ocupat. Tancant processos anteriors..."
+  lsof -ti :8000 | xargs kill -9
 fi
 
 # Llança rosbridge
 echo "Iniciant rosbridge_server..."
-#ros2 launch rosbridge_server main_rosbridge_launch.py &
 ros2 launch rosbridge_server rosbridge_websocket_launch.xml &
 ROSBRIDGE_PID=$!
 
@@ -36,14 +35,14 @@ echo "Canviant al directori web..."
 cd ~/ROS2_rUBot_mecanum_ws/web || exit
 
 # Llança servidor web
-echo "Iniciant servidor web a http://localhost:7000..."
-python3 -m http.server 7000 &
+echo "Iniciant servidor web a http://localhost:8000..."
+python3 -m http.server 8000 &
 WEBSERVER_PID=$!
 
 sleep 8
 
 # Mostra adreça web en terminal separat
-xterm -hold -e ~/bin/webpage_address &
+#xterm -hold -e ~/bin/webpage_address &
 
 # Espera que els processos acabin
 wait $ROSBRIDGE_PID $WEBSERVER_PID
