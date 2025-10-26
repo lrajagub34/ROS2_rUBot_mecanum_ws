@@ -144,6 +144,7 @@
       border: 1px solid var(--card-bd);
       border-radius: 5px;
       display: block;
+      background-color: #e6e6e6; /* ✅ gris clar de fons per millorar visibilitat */
     }
 
     /* ======= Responsive (mòbil) ======= */
@@ -225,9 +226,9 @@
     let cmdVelTopic;
 
     // --- Configuració ---
-    const MAP_RESOLUTION = 0.02; // m/píxel (escala del teu mapa en my_map.yaml)
+    const MAP_RESOLUTION = 0.01; // m/píxel (escala del teu mapa en my_map.yaml)
     const ROBOT_RADIUS = 5;      // píxels (al canvas)
-    const SPEED_VECTOR_SCALE = 50; // píxels per (m/s) per la fletxa de velocitat
+    const SPEED_VECTOR_SCALE = 100; // píxels per (m/s) per la fletxa de velocitat
 
     // Límits (opció C)
     const maxSpeed = 0.3;  // m/s (per Vx i Vy, amb clamp vectorial)
