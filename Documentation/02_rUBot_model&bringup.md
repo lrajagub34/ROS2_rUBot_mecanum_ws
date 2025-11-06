@@ -503,7 +503,7 @@ Bringup your rUBot model within the real custom designed World
 
 You will have to:
 - Design a `rubot_custom.urdf`, with:
-  - Customized model colors (rviz and gazebo)
+  - Customized model colors (rviz and gazebo) **DONE**
   - Added a 3D-part on top with a fixed joint
 - Design a `group1_custom.world` virtual world using the wooden model parts
 

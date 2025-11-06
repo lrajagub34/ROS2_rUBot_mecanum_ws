@@ -230,7 +230,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/number2.stl" scale="0.0008 0.0008 0.0008"/>
         <!--<box size="0.05 0.05 0.025"/>-->
       </geometry>
-      <material name="red_plastic"/>
+      <material name="yellow"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -243,6 +243,37 @@
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
     </inertial>
   </link>
+    <!-- Small top number2 part, aligned with LIDAR height -->
+  <joint name="joint_number2" type="fixed">
+    <origin rpy="0 0 0" xyz="0.08 0.0 0.14"/>
+    <parent link="base_link"/>
+    <child link="number2_link"/>
+  </joint>
+
+  <link name="number2_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find my_robot_description)/meshes/rubot/number_2.stl"
+              scale="0.0006 0.0006 0.0006"/>
+      </geometry>
+      <material name="red_plastic"/>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.03 0.03 0.02"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.005"/>
+      <inertia ixx="5e-7" ixy="0" ixz="0"
+               iyy="5e-7" iyz="0" izz="5e-7"/>
+    </inertial>
+  </link>
+
   <!-- Mecanum drive controller -->
   <gazebo>
         <plugin name="mecanum_controller" filename="libgazebo_ros_planar_move.so">
