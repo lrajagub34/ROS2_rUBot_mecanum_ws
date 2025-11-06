@@ -37,6 +37,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/base_link.stl" scale="0.001 0.001 0.001"/>
+        
         <!-- <box size="0.26 0.15 0.08"/>-->
       </geometry>
       <material name="blue_metal"/>
@@ -67,7 +68,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/upper_left_wheel.stl" scale="0.001 0.001 0.001"/>
         <!-- <cylinder length="0.03" radius="0.05"/>-->
       </geometry>
-      <material name="light_grey"/>
+      <material name="red_plastic"/>
     </visual>
     <collision>
       <origin rpy="-1.57 0 0" xyz="0 0 0"/>
@@ -94,7 +95,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/lower_left_wheel.stl" scale="0.001 0.001 0.001"/>
         <!--<cylinder length="0.03" radius="0.05"/>-->
       </geometry>
-      <material name="light_grey"/>
+      <material name="red_plastic"/>
     </visual>
     <collision>
       <origin rpy="-1.57 0 0" xyz="0 0 0"/>
@@ -121,7 +122,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/upper_right_wheel.stl" scale="0.001 0.001 0.001"/>
         <!--<cylinder length="0.03" radius="0.05"/>-->
       </geometry>
-      <material name="light_grey"/>
+      <material name="red_plastic"/>
     </visual>
     <collision>
       <origin rpy="-1.57 0 0" xyz="0 0 0"/>
@@ -148,7 +149,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/lower_right_wheel.stl" scale="0.001 0.001 0.001"/>
         <!--<cylinder length="0.03" radius="0.05"/>-->
       </geometry>
-      <material name="light_grey"/>
+      <material name="red_plastic"/>
     </visual>
     <collision>
       <origin rpy="-1.57 0 0" xyz="0 0 0"/>
@@ -174,7 +175,7 @@
       <geometry>
         <box size="0.05 0.05 0.025"/>
       </geometry>
-      <material name="black"/>
+      <material name="red_plastic"/>
     </visual>
     <collision>
       <origin rpy="0 1.57 0" xyz="0 0 0"/>
@@ -196,7 +197,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/Lidar.stl" scale="0.001 0.001 0.001"/>
         <!--<cylinder length="0.05" radius="0.05"/>-->
       </geometry>
-      <material name="black"/>
+      <material name="red_plastic"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -229,7 +230,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/number2.stl" scale="0.0008 0.0008 0.0008"/>
         <!--<box size="0.05 0.05 0.025"/>-->
       </geometry>
-      <material name="light_grey"/>
+      <material name="red_plastic"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
