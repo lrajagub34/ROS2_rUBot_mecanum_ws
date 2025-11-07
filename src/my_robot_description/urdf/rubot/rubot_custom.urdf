@@ -425,4 +425,38 @@
     <maxVel>0.5</maxVel>
     <fdir1>1 0 0</fdir1>
   </gazebo>
+
+  <!-- === Fixed joint and 3D-part on top of the robot === -->
+  <joint name="joint_object3D" type="fixed">
+    <!-- Lloc on va la peça -->
+    <origin xyz="0.0 0.0 0.1" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="object3D_link"/>
+  </joint>
+  <link name="object3D_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find my_robot_description)/meshes/rubot/object3D.stl"
+            scale="0.05 0.05 0.05"/>
+      </geometry>
+      <material name="yellow"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.02"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0"
+               iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <!-- Colores Gazebo -->
+  <gazebo reference="object3D_link">
+    <material>Gazebo/Yellow</material>
+  </gazebo>
+
 </robot>
