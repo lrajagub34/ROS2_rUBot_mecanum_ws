@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Custom LIDAR Test -->
+  <node 
+      pkg="my_robot_control" 
+      exec="custom_rubot_lidar_test_exec" 
+      name="custom_lidar_test_node" 
+      output="screen">
+  </node>
+</launch>
