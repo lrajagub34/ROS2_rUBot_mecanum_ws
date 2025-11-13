@@ -5,4 +5,4 @@ In this ROS2 repository we design, simulate and control different robots:
 - Limo commercial robot
 
 Trial alba;)
-Trial marc 
+Trial marc 2
