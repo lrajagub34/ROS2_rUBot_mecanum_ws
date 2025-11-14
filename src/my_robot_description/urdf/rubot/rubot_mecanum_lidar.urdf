@@ -16,13 +16,6 @@
   <material name="light_grey">
     <color rgba="0.75 0.75 0.75 1.0"/>
   </material>
-  <material name="blue_metal">
-    <color rgba="0.05 0.2 0.6 1.0"/>
-  </material>
-  <material name="red_plastic">
-    <color rgba="0.8 0.1 0.1 1.0"/>
-  </material>
-
 
 <!-- base_footprint reference frame without inertia is needed -->
   <link name="base_footprint"/>
@@ -37,10 +30,9 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/base_link.stl" scale="0.001 0.001 0.001"/>
-        
         <!-- <box size="0.26 0.15 0.08"/>-->
       </geometry>
-      <material name="blue_metal"/>
+      <material name="yellow"/>
     </visual>
     <collision>
       <origin xyz="0 0 0"/>
@@ -68,7 +60,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/upper_left_wheel.stl" scale="0.001 0.001 0.001"/>
         <!-- <cylinder length="0.03" radius="0.05"/>-->
       </geometry>
-      <material name="red_plastic"/>
+      <material name="light_grey"/>
     </visual>
     <collision>
       <origin rpy="-1.57 0 0" xyz="0 0 0"/>
@@ -95,7 +87,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/lower_left_wheel.stl" scale="0.001 0.001 0.001"/>
         <!--<cylinder length="0.03" radius="0.05"/>-->
       </geometry>
-      <material name="red_plastic"/>
+      <material name="light_grey"/>
     </visual>
     <collision>
       <origin rpy="-1.57 0 0" xyz="0 0 0"/>
@@ -122,7 +114,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/upper_right_wheel.stl" scale="0.001 0.001 0.001"/>
         <!--<cylinder length="0.03" radius="0.05"/>-->
       </geometry>
-      <material name="red_plastic"/>
+      <material name="light_grey"/>
     </visual>
     <collision>
       <origin rpy="-1.57 0 0" xyz="0 0 0"/>
@@ -149,7 +141,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/lower_right_wheel.stl" scale="0.001 0.001 0.001"/>
         <!--<cylinder length="0.03" radius="0.05"/>-->
       </geometry>
-      <material name="red_plastic"/>
+      <material name="light_grey"/>
     </visual>
     <collision>
       <origin rpy="-1.57 0 0" xyz="0 0 0"/>
@@ -175,7 +167,7 @@
       <geometry>
         <box size="0.05 0.05 0.025"/>
       </geometry>
-      <material name="red_plastic"/>
+      <material name="black"/>
     </visual>
     <collision>
       <origin rpy="0 1.57 0" xyz="0 0 0"/>
@@ -197,7 +189,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/Lidar.stl" scale="0.001 0.001 0.001"/>
         <!--<cylinder length="0.05" radius="0.05"/>-->
       </geometry>
-      <material name="red_plastic"/>
+      <material name="black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -230,7 +222,7 @@
         <mesh filename="file://$(find my_robot_description)/meshes/rubot/number2.stl" scale="0.0008 0.0008 0.0008"/>
         <!--<box size="0.05 0.05 0.025"/>-->
       </geometry>
-      <material name="yellow"/>
+      <material name="light_grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -243,68 +235,6 @@
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
     </inertial>
   </link>
-    <!-- Small top number2 part, aligned with LIDAR height -->
-  <joint name="joint_number2" type="fixed">
-    <origin rpy="0 0 0" xyz="0.08 0.0 0.14"/>
-    <parent link="base_link"/>
-    <child link="number2_link"/>
-  </joint>
-
-  <link name="number2_link">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <mesh filename="file://$(find my_robot_description)/meshes/rubot/number_2.stl"
-              scale="0.0006 0.0006 0.0006"/>
-      </geometry>
-      <material name="red_plastic"/>
-    </visual>
-
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <box size="0.03 0.03 0.02"/>
-      </geometry>
-    </collision>
-
-    <inertial>
-      <mass value="0.005"/>
-      <inertia ixx="5e-7" ixy="0" ixz="0"
-               iyy="5e-7" iyz="0" izz="5e-7"/>
-    </inertial>
-  </link>
-
-
-  <!-- === Fixed joint and 3D-part on top of the robot === -->
-  <joint name="joint_object3D" type="fixed">
-    <!-- Lloc on va la peça -->
-    <origin xyz="0.015 0.0 0.1445" rpy="0 0 90"/>
-    <parent link="base_link"/>
-    <child link="object3D_link"/>
-  </joint>
-  <link name="object3D_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="file://$(find my_robot_description)/meshes/rubot/object3D.stl" scale="0.000012 0.000012 0.000012"/>
-      </geometry>
-      <material name="yellow"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="file://$(find my_robot_description)/meshes/rubot/object3D.stl" scale="0.000012 0.000012 0.000012"/>
-        <box size="0.05 0.05 0.05"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.01"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0"
-               iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  
-
   <!-- Mecanum drive controller -->
   <gazebo>
         <plugin name="mecanum_controller" filename="libgazebo_ros_planar_move.so">
@@ -370,10 +300,10 @@
     <ray>
       <scan>
         <horizontal>
-          <samples>720</samples>
+          <samples>720</samples> <!-- = laser beams -> angle_increment = 0.008727 rad -->
           <resolution>1.00000</resolution>
-          <min_angle>-3.141593</min_angle>
-          <max_angle>3.141593</max_angle>
+          <min_angle>-3.141593</min_angle> <!-- min angle changed (from 0 rad to -pi)-->
+          <max_angle>3.141593</max_angle> <!-- max angle changed (from 2pi rad to pi)-->
         </horizontal>
       </scan>
       <range>
@@ -399,7 +329,7 @@
 <!-- Gazebo colors have to be specified here with predefined Gazebo colors -->
 <!-- lower friction with floor -->
   <gazebo reference="base_link">
-    <material>Gazebo/Blue</material>
+    <material>Gazebo/Yellow</material>
     <mu1>0.005</mu1>
     <mu2>0.005</mu2>
   </gazebo>
@@ -456,5 +386,4 @@
     <maxVel>0.5</maxVel>
     <fdir1>1 0 0</fdir1>
   </gazebo>
-
 </robot>
