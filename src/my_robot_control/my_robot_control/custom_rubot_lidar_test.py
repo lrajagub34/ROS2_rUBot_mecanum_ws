@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
+import math
 
 
 class LidarTest(Node):
@@ -14,50 +15,73 @@ class LidarTest(Node):
             self.listener_callback,
             10
         )
-        self.scan_msg_shown = False
         self.last_print_time = self.get_clock().now().seconds_nanoseconds()[0]
+
+        self.angle_offset_deg = 180.0  # lidar mounted backwards
+
+    def wrap_angle(self, angle_deg):
+        """Wrap to [-180, 180)."""
+        while angle_deg >= 180.0:
+            angle_deg -= 360.0
+        while angle_deg < -180.0:
+            angle_deg += 360.0
+        return angle_deg
+
+    def angle_to_index(self, angle_deg, scan):
+        angle_rad = math.radians(angle_deg)
+        return int((angle_rad - scan.angle_min) / scan.angle_increment)
 
     def listener_callback(self, scan):
         current_time = self.get_clock().now().seconds_nanoseconds()[0]
         if current_time - self.last_print_time < 1:
-            return  # Skip printing if less than 1 second has passed
+            return
 
-        angle_min_deg = scan.angle_min * 180.0 / 3.14159
-        angle_max_deg = scan.angle_max * 180.0 / 3.14159
-        angle_increment_deg = scan.angle_increment * 180.0 / 3.14159
+        # ----- Compute the 3 angles with offset -----
+        angle_0     = self.wrap_angle(0   + self.angle_offset_deg)
+        angle_neg90 = self.wrap_angle(-90 + self.angle_offset_deg)
+        angle_pos90 = self.wrap_angle(90  + self.angle_offset_deg)
 
-        # Indices for specific angles in rUBot (-180deg to 180deg at 0.5deg/index)
-        index_0_deg = int((0 - angle_min_deg) / angle_increment_deg)
-        index_neg90_deg = int((-90 - angle_min_deg) / angle_increment_deg)
-        index_pos90_deg = int((90 - angle_min_deg) / angle_increment_deg)
-        dist_0_deg = scan.ranges[index_0_deg]
-        dist_neg90_deg = scan.ranges[index_neg90_deg]
-        dist_pos90_deg = scan.ranges[index_pos90_deg]
+        # ----- Convert to indices -----
+        index_0     = self.angle_to_index(angle_0, scan)
+        index_neg90 = self.angle_to_index(angle_neg90, scan)
+        index_pos90 = self.angle_to_index(angle_pos90, scan)
+
+        # ----- All indices guaranteed valid now -----
+        dist_0     = scan.ranges[index_0]
+        dist_neg90 = scan.ranges[index_neg90]
+        dist_pos90 = scan.ranges[index_pos90]
 
         self.get_logger().info("---- LIDAR readings ----")
-        self.get_logger().info(f"Distance at 0°: {dist_0_deg:.2f} m" if dist_0_deg else "No valid reading at 0°")
-        self.get_logger().info(f"Distance at -90°: {dist_neg90_deg:.2f} m" if dist_neg90_deg else "No valid reading at -90°")
-        self.get_logger().info(f"Distance at +90°: {dist_pos90_deg:.2f} m" if dist_pos90_deg else "No valid reading at +90°")
+        self.get_logger().info(f"Distance at 0°: {dist_0:.2f} m")
+        self.get_logger().info(f"Distance at -90°: {dist_neg90:.2f} m")
+        self.get_logger().info(f"Distance at +90°: {dist_pos90:.2f} m")
 
-        custom_range = []
+        # ----- Find closest -----
+        valid = [(d, i) for i, d in enumerate(scan.ranges)
+                 if d not in (0.0, float('inf'))]
 
-        for i, distance in enumerate(scan.ranges):
-            if distance == float('inf') or distance == 0.0:
-                continue
-            custom_range.append((distance, i))
+        if valid:
+            closest, idx = min(valid)
+            angle_min_deg = math.degrees(scan.angle_min)
+            angle_inc_deg = math.degrees(scan.angle_increment)
 
-        if custom_range:
-            closest_distance, element_index = min(custom_range)
-            angle_closest_distance = angle_min_deg + element_index * angle_increment_deg
-            
-            self.get_logger().info("---- LIDAR readings: Min distance ----")
-            self.get_logger().info(f"Minimum distance: {closest_distance:.2f} m at angle {angle_closest_distance:.2f}°")
+            angle_closest = angle_min_deg + idx * angle_inc_deg
+            angle_closest -= self.angle_offset_deg
+            angle_closest = self.wrap_angle(angle_closest)
+
+            self.get_logger().info("---- Closest point ----")
+            self.get_logger().info(f"Minimum distance: {closest:.2f} m at angle {angle_closest:.2f}°")
 
         self.last_print_time = current_time
 
+
 def main(args=None):
     rclpy.init(args=args)
-    lidar1_test = LidarTest()
-    rclpy.spin(lidar1_test)
-    lidar1_test.destroy_node()
+    node = LidarTest()
+    rclpy.spin(node)
+    node.destroy_node()
     rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
