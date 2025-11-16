@@ -71,7 +71,7 @@ class LidarTest(Node):
 
             self.get_logger().info("---- Closest point ----")
             self.get_logger().info(f"Minimum distance: {closest:.2f} m at angle {angle_closest:.2f}°")
-
+            
         self.last_print_time = current_time
 
 
