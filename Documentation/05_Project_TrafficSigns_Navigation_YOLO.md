@@ -27,31 +27,31 @@ To proceed with the signal identification we first bringup the robot and navigat
 - Bringup the robot
     - In simulation:
     ````shell
-    ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml use_sim_time:=True x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square4m_sign.world
+    ros2 launch my_robot_bringup my_robot_bringup_sw.launch.xml use_sim_time:=true x0:=0.5 y0:=-1.5 yaw0:=1.57 robot:=rubot/rubot_mecanum.urdf custom_world:=square4m_sign.world
     ````
     >Important: Include a traffic signal in the world. When using "square4m_sign.world" you can change the sign model on line 30 changing the traffic sign model name
     - In real robot LIMO the bringup is already made when turned on
 
 - Generate a map
     - In simulation:
-    ````shell
-    ros2 launch my_robot_cartographer cartographer.launch.py use_sim_time:=True
-    ````
-    - In real robot LIMO:
-    ````shell
-    ros2 launch my_robot_cartographer cartographer.launch.py use_sim_time:=False
-    ````
-    - Save the map in my_robot_navigation2/map folder with:
+        ````shell
+        ros2 launch my_robot_cartographer cartographer.launch.py use_sim_time:=true
+        ````
+    - In real robot (rUBot or LIMO):
+        ````shell
+        ros2 launch my_robot_cartographer cartographer.launch.py use_sim_time:=false
+        ````
+- Save the map in my_robot_navigation2/map folder with:
     ````shell
     cd src/Navigation_Projects/my_robot_navigation2/map/
-    ros2 run nav2_map_server map_saver_cli -f my_map_yolo
+    ros2 run nav2_map_server map_saver_cli -f map_square4m_sign
     ````
 - Navigate using the Map:
     - In simulation:
         ````bash
-        ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=True map:=map_square4m_sign.yaml param:=limo_sw.yaml
+        ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=true map_file:=map_square4m_sign.yaml params_file:=limo_sw.yaml
         ````
-        >For LIMO: We use "limo_sw.yaml" file. In case we want to priorize the lidar data from odometry data we will use Limo_sw_lidar.yaml
+        >For LIMO: We use `limo_sw.yaml` file. In case we want to priorize the lidar data from odometry data we will use `limo_sw_lidar.yaml`. Equivalent names are found for rUBot real robot.
 
         ![](./Images/07_Yolo/10_nav_sw.png)
     - In the case of real robot:
@@ -60,7 +60,7 @@ To proceed with the signal identification we first bringup the robot and navigat
             - base_link: as the ``robot_base_frame``
         - We have to create "LIMO_real.yaml" file in "param" folder correcting base_frame_id: "odom" (instead of base_footprint)
         ````shell
-        ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=False map:=map_square4m_sign.yaml param:=limo_real.yaml
+        ros2 launch my_robot_navigation2 navigation2_robot.launch.py use_sim_time:=false map_file:=map_square4m_sign.yaml params_file:=limo_real.yaml
         ````
 
 ## **3. Model Training**
