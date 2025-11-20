@@ -133,7 +133,7 @@ class RobotSelfControl(Node):
         # React to obstacle
         if closest_distance < self._distanceLimit:
             if zone == "F":
-                self._msg.angular.z = 0.0 ### no girar, només que es mogui cap enrere
+                self._msg.angular.z = self._rotationSpeed * self._speedFactor ###  rotation to LEFT
                 self._msg.linear.x = -self._forwardSpeed * self._speedFactor ### BACK
             elif zone == "FL":
                 self._msg.angular.z = -self._rotationSpeed * self._speedFactor ###  rotation to RIGHT
