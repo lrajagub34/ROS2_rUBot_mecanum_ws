@@ -11,7 +11,7 @@ class WallFollower(Node):
         super().__init__('wall_follower_node')
 
         # Parameters
-        self.declare_parameter('distance_limit', 0.5)    # desired distance to right wall
+        self.declare_parameter('distance_limit', 0.15)    # desired distance to right wall
         self.declare_parameter('forward_speed', 0.20)    # linear speed
         self.declare_parameter('turn_speed', 0.40)       # angular speed
         self.declare_parameter('time_to_stop', 30.0)     # auto-stop
@@ -144,9 +144,13 @@ class WallFollower(Node):
         # Minimal distances
         #### ADD ALL ZONES #############################################
         min_front      = min(FRONT)      if FRONT      else float('inf')
-        min_FRONT_RIGHT   = min(FRONT_RIGHT)   if FRONT_RIGHT   else float('inf')
+        min_front_right   = min(FRONT_RIGHT)   if FRONT_RIGHT   else float('inf')
         min_right      = min(RIGHT)      if RIGHT      else float('inf')
         min_back_right = min(BACK_RIGHT) if BACK_RIGHT else float('inf')
+        min_back       = min(BACK)       if BACK       else float('inf')
+        min_back_left  = min(BACK_LEFT)  if BACK_LEFT  else float('inf')
+        min_left       = min(LEFT)       if LEFT       else float('inf')
+        min_front_left = min(FRONT_LEFT) if FRONT_LEFT else float('inf')
 
         twist = Twist()
         action = ""
@@ -164,11 +168,11 @@ class WallFollower(Node):
         #----------------------------------------------------------
         # RULE 2: FRONT-RIGHT obstacle → slow + left
         #----------------------------------------------------------
-        elif min_FRONT_RIGHT < self.base_distance:
+        elif min_front_right < self.base_distance:
             twist.linear.x = 0.0
             twist.linear.y = 0.0
             twist.angular.z = self.v_ang * 2.0
-            action = f"FRONT-RIGHT {min_FRONT_RIGHT:.2f} m → turn LEFT"
+            action = f"FRONT-RIGHT {min_front_right:.2f} m → turn LEFT"
 
         #----------------------------------------------------------
         # RULE 3: RIGHT visible → control with tolerance band (no vy)
@@ -222,6 +226,15 @@ class WallFollower(Node):
                 f"BACK-RIGHT {min_back_right:.2f} m → "
                 f"very slow + STRONG RIGHT turn (2*w)"
             )
+
+        #----------------------------------------------------------
+        # RULE 5: BACK obstacle → forward
+        #----------------------------------------------------------
+        elif min_back < self.base_distance:
+            twist.linear.x = self.v_lin
+            twist.linear.y = 0.0
+            twist.angular.z = 0.0
+            action = f"BACK {min_back:.2f} m → go FORWARD"
 
         # if nothing is visible, twist remains zero -> robot stops
 
