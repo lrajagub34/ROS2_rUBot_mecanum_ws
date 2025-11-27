@@ -43,7 +43,8 @@ class RobotSelfControl(Node):
         # moviment inicial: es mou cap endavant
         self._msg = Twist()
         self._msg.linear.x = self._forwardSpeed * self._speedFactor # CONTROL FRONTAL
-        self._msg.angular.z = 0.0 # GIR AL VOLTANT DE L'EIX Z
+        #self._msg.angular.z = 0.0 # GIR AL VOLTANT DE L'EIX Z
+        self._msg.linear.y = 0.0
 
         self._cmdVel = self.create_publisher(Twist, '/cmd_vel', 10)
         self.timer = self.create_timer(0.05, self.timer_callback)
@@ -133,32 +134,33 @@ class RobotSelfControl(Node):
         # React to obstacle
         if closest_distance < self._distanceLimit:
             if zone == "F":
-                self._msg.angular.z = self._rotationSpeed * self._speedFactor ###  rotation to LEFT
                 self._msg.linear.x = -self._forwardSpeed * self._speedFactor ### BACK
+                self._msg.linear.y = 0.0
             elif zone == "FL":
-                self._msg.angular.z = -self._rotationSpeed * self._speedFactor ###  rotation to RIGHT
                 self._msg.linear.x = -self._forwardSpeed * self._speedFactor ### BACK
+                self._msg.linear.y = -self._forwardSpeed * self._speedFactor
             elif zone == "FR":
-                self._msg.angular.z = self._rotationSpeed * self._speedFactor ###  rotation to LEFT
                 self._msg.linear.x = -self._forwardSpeed * self._speedFactor ### BACK
+                self._msg.linear.y = self._forwardSpeed * self._speedFactor
             elif zone == "L":
-                self._msg.angular.z = -self._rotationSpeed * self._speedFactor ### rotation to RIGHT
                 self._msg.linear.x = 0.0
+                self._msg.linear.y = -self._forwardSpeed * self._speedFactor
             elif zone == "R":
-                self._msg.angular.z = self._rotationSpeed * self._speedFactor ### rotation to LEFT
                 self._msg.linear.x = 0.0
+                self._msg.linear.y = self._forwardSpeed * self._speedFactor
             elif zone == "BL":
-                self._msg.angular.z = -self._rotationSpeed * self._speedFactor ###  rotation to RIGHT
                 self._msg.linear.x = self._forwardSpeed * self._speedFactor ### FORWARD
+                self._msg.linear.y = -self._forwardSpeed * self._speedFactor
             elif zone == "BR":
-                self._msg.angular.z = self._rotationSpeed * self._speedFactor ###  rotation to LEFT
                 self._msg.linear.x = self._forwardSpeed * self._speedFactor ### FORWARD
+                self._msg.linear.y = self._forwardSpeed * self._speedFactor
             else:
-                self._msg.angular.z = 0.0
                 self._msg.linear.x = self._forwardSpeed * self._speedFactor
+                self._msg.linear.y = 0.0
         else:
             self._msg.linear.x = self._forwardSpeed * self._speedFactor
-            self._msg.angular.z = 0.0
+            self._msg.linear.y = 0.0
+
 
     def stop(self):
         self._shutting_down = True
