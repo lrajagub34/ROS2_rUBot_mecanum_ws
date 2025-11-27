@@ -105,9 +105,14 @@ class WallFollower(Node):
 
         #### ADD ALL ZONES #############################################
         FRONT       = []
-        FR_RIGHT    = []
+        FRONT_RIGHT = []
         RIGHT       = []
         BACK_RIGHT  = []
+        BACK        = []
+        BACK_LEFT   = []
+        LEFT        = []
+        FRONT_LEFT  = []
+        
 
         for i, d in enumerate(scan.ranges):
             if not math.isfinite(d):
@@ -121,16 +126,25 @@ class WallFollower(Node):
             if -20 <= ang <= 20:
                 FRONT.append(d)
             elif -70 <= ang < -20:
-                FR_RIGHT.append(d)
+                FRONT_RIGHT.append(d)
             elif -110 <= ang < -70:
                 RIGHT.append(d)
             elif -160 <= ang < -110:
                 BACK_RIGHT.append(d)
+            elif 110 <= ang < 160:
+                BACK_LEFT.append(d)
+            elif 70 <= ang < 110:
+                LEFT.append(d)
+            elif 20 <= ang < 70:
+                FRONT_LEFT.append(d)
+            else:
+                BACK.append(d)
+
 
         # Minimal distances
         #### ADD ALL ZONES #############################################
         min_front      = min(FRONT)      if FRONT      else float('inf')
-        min_fr_right   = min(FR_RIGHT)   if FR_RIGHT   else float('inf')
+        min_FRONT_RIGHT   = min(FRONT_RIGHT)   if FRONT_RIGHT   else float('inf')
         min_right      = min(RIGHT)      if RIGHT      else float('inf')
         min_back_right = min(BACK_RIGHT) if BACK_RIGHT else float('inf')
 
@@ -150,11 +164,11 @@ class WallFollower(Node):
         #----------------------------------------------------------
         # RULE 2: FRONT-RIGHT obstacle → slow + left
         #----------------------------------------------------------
-        elif min_fr_right < self.base_distance:
+        elif min_FRONT_RIGHT < self.base_distance:
             twist.linear.x = 0.0
             twist.linear.y = 0.0
             twist.angular.z = self.v_ang * 2.0
-            action = f"FRONT-RIGHT {min_fr_right:.2f} m → turn LEFT"
+            action = f"FRONT-RIGHT {min_FRONT_RIGHT:.2f} m → turn LEFT"
 
         #----------------------------------------------------------
         # RULE 3: RIGHT visible → control with tolerance band (no vy)
