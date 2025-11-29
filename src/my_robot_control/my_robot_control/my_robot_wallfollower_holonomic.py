@@ -171,13 +171,10 @@ class WallFollower(Node):
         #----------------------------------------------------------
         # RULE 0: FIND AND APPROACH TO THE CLOSEST WALL
         #----------------------------------------------------------
-        if (min_front >= self.base_distance and
-            min_front_right >= self.base_distance and
-            min_right >= self.base_distance
-            ):
-            zone_min = min(zones_dict, key=zones_dict.get) ### definir en quina zona està l'obstacle més proper
-            dist_min = zones_dict[zone_min] ### definir a quina distància està la min_zone
-
+        zone_min = min(zones_dict, key=zones_dict.get) ### definir en quina zona està l'obstacle més proper
+        dist_min = zones_dict[zone_min] ### definir a quina distància està la min_zone
+        if (dist_min >= self.base_distance):
+        
             if zone_min == "FRONT":
                 twist.linear.x = self.v_lin * 0.5
                 twist.linear.y = 0.0
