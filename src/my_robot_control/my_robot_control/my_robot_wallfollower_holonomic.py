@@ -152,14 +152,70 @@ class WallFollower(Node):
         min_left       = min(LEFT)       if LEFT       else float('inf')
         min_front_left = min(FRONT_LEFT) if FRONT_LEFT else float('inf')
 
+        zones_dict = {
+            "FRONT" : min_front,
+            "FRONTRIGHT" : min_front_right,
+            "FRONTLEFT" : min_front_left,
+            "RIGHT" : min_right,
+            "LEFT" : min_left,
+            "BACKRIGHT" : min_back_right,
+            "BACKLEFT" : min_back_left,
+            "BACK" : min_back
+        }
+
+        
         twist = Twist()
         action = ""
 
         #### ADD RULES FOR ALL ZONES (HOLONOMIC) #############################################
         #----------------------------------------------------------
+        # RULE 0: FIND AND APPROACH TO THE CLOSEST WALL
+        #----------------------------------------------------------
+        if (min_front >= self.base_distance and
+            min_front_right >= self.base_distance and
+            min_right >= self.base_distance
+            ):
+            zone_min = min(zones_dict, key=zones_dict.get) ### definir en quina zona està l'obstacle més proper
+            dist_min = zones_dict[zone_min] ### definir a quina distància està la min_zone
+
+            if zone_min == "FRONT":
+                twist.linear.x = self.v_lin * 0.5
+                twist.linear.y = 0.0
+                action = f"THE CLOSEST WALL IS {zone_min} at {dist_min:.2f} m → Go Forward"
+            elif zone_min == "FRONTLEFT":
+                twist.linear.x = self.v_lin * 0.5
+                twist.linear.y = - self.v_lin * 0.5
+                action = f"THE CLOSEST WALL IS {zone_min} at {dist_min:.2f} m → Go Forward Left"
+            elif zone_min == "FRONTRIGHT":
+                twist.linear.x = self.v_lin * 0.5
+                twist.linear.y = self.v_lin * 0.5
+                action = f"THE CLOSEST WALL IS {zone_min} at {dist_min:.2f} m → Go Forward Rigt"
+            elif zone_min == "RIGHT":
+                twist.linear.x = 0.0
+                twist.linear.y = self.v_lin * 0.5
+                action = f"THE CLOSEST WALL IS {zone_min} at {dist_min:.2f} m → Go Right"
+            elif zone_min == "LEFT":
+                twist.linear.x = 0.0
+                twist.linear.y = - self.v_lin * 0.5
+                action = f"THE CLOSEST WALL IS {zone_min} at {dist_min:.2f} m → Go Left"
+            elif zone_min == "BACKRIGHT":
+                twist.linear.x = - self.v_lin * 0.5
+                twist.linear.y = self.v_lin * 0.5
+                action = f"THE CLOSEST WALL IS {zone_min} at {dist_min:.2f} m → Go Back Left"
+            elif zone_min == "BACKLEFT":
+                twist.linear.x = - self.v_lin * 0.5
+                twist.linear.y = - self.v_lin * 0.5
+                action = f"THE CLOSEST WALL IS {zone_min} at {dist_min:.2f} m → Go Back Right"
+            elif zone_min == "BACK":
+                twist.linear.x = - self.v_lin * 0.5
+                twist.linear.y = 0.0
+                action = f"THE CLOSEST WALL IS {zone_min} at {dist_min:.2f} m → Go Back"
+
+
+        #----------------------------------------------------------
         # RULE 1: FRONT obstacle → turn left
         #----------------------------------------------------------
-        if min_front < self.base_distance:
+        elif min_front < self.base_distance:
             twist.linear.x = 0.0
             twist.linear.y = 0.0
             twist.angular.z = self.v_ang * 2.0
@@ -205,8 +261,8 @@ class WallFollower(Node):
             else:
                 # Too far from right wall → slow forward + stronger right turn
                 twist.linear.x = self.v_lin * 0.5
-                twist.linear.y = 0.0
-                twist.angular.z = -self.v_ang * 2.0
+                twist.linear.y = self.v_lin * 0.25  #abans era: 0.0 però el volem holonomic
+                twist.angular.z = 0.0 #abans era: "-self.v_ang * 2.0"
                 action = (
                     f"RIGHT too FAR ({min_right:.2f} m > "
                     f"{self.base_distance:.2f}+{self.tol:.2f}) → "
@@ -216,6 +272,7 @@ class WallFollower(Node):
         #----------------------------------------------------------
         # RULE 4: BACK-RIGHT → only if it is the most relevant wall
         #----------------------------------------------------------
+        #### CREC QUE AQUESTA JA NO CAL
         elif math.isfinite(min_back_right) and (
             not math.isfinite(min_right) or min_back_right <= min_right
         ):
@@ -227,14 +284,7 @@ class WallFollower(Node):
                 f"very slow + STRONG RIGHT turn (2*w)"
             )
 
-        #----------------------------------------------------------
-        # RULE 5: BACK obstacle → forward
-        #----------------------------------------------------------
-        elif min_back < self.base_distance:
-            twist.linear.x = self.v_lin
-            twist.linear.y = 0.0
-            twist.angular.z = 0.0
-            action = f"BACK {min_back:.2f} m → go FORWARD"
+        
 
         # if nothing is visible, twist remains zero -> robot stops
 
