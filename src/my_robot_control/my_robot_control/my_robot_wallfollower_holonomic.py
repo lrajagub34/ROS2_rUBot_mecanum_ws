@@ -281,7 +281,61 @@ class WallFollower(Node):
                 f"very slow + STRONG RIGHT turn (2*w)"
             )
 
+        #----------------------------------------------------------
+        # RULE 5: FRONT-LEFT obstacle → turn right
+        #----------------------------------------------------------
+        elif min_front_left < self.base_distance:
+            twist.linear.x = 0.0
+            twist.linear.y = 0.0
+            twist.angular.z = -self.v_ang * 2.0
+            action = f"FRONT-LEFT {min_front_left:.2f} m → turn RIGHT"
         
+        #----------------------------------------------------------
+        # RULE 6: LEFT visible → move slightly right
+        #----------------------------------------------------------
+        elif math.isfinite(min_left):
+            error = min_left - self.base_distance
+            
+            if abs(error) <= self.tol:
+                twist.linear.x = self.v_lin
+                twist.linear.y = 0.0
+                twist.angular.z = -self.v_ang * 0.5
+                action = (
+                    f"LEFT ~OK ({min_left:.2f} m) → "
+                    f"keep distance but bias RIGHT"
+                )
+            
+            elif error < 0:
+                # Massa a prop d’esquerra → mou-te a la dreta
+                twist.linear.x = self.v_lin * 0.5
+                twist.linear.y = self.v_lin * 0.5
+                twist.angular.z = -self.v_ang
+                action = (
+                    f"LEFT too CLOSE ({min_left:.2f} m) → "
+                    f"forward + RIGHT correction"
+                )
+
+            else:
+                # Massa lluny → mantén esquerra fora de control, però NO hi vagis
+                twist.linear.x = self.v_lin
+                twist.linear.y = 0.0
+                twist.angular.z = 0.0
+                action = (
+                    f"LEFT too FAR ({min_left:.2f} m) → "
+                    f"ignore LEFT, go STRAIGHT"
+                )
+        
+        #----------------------------------------------------------
+        # RULE 7: BACK-LEFT → push robot slightly right
+        #----------------------------------------------------------
+        elif math.isfinite(min_back_left):
+            twist.linear.x = self.v_lin * 0.25
+            twist.linear.y = self.v_lin * 0.5
+            twist.angular.z = 0.0
+            action = (
+                f"BACK-LEFT {min_back_left:.2f} m → "
+                f"slow + slide RIGHT"
+            )
 
         # if nothing is visible, twist remains zero -> robot stops
 
