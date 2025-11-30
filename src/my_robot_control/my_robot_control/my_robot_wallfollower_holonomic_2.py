@@ -102,12 +102,11 @@ class WallFollower(Node):
         angle_min = math.degrees(scan.angle_min)
         angle_inc = math.degrees(scan.angle_increment)
 
-        # 1. DEFINIM TOTES LES ZONES (Ara incloem l'esquerra)
-        FRONT       = []
-        FR_RIGHT    = []
-        RIGHT       = []
-        BACK_RIGHT  = []
-        FR_LEFT     = []  # Nova zona
+        FRONT        = []
+        FR_RIGHT     = []
+        RIGHT        = []
+        BACK_RIGHT   = []
+        FR_LEFT      = [] # <--- NEW ZONE ADDED
 
         for i, d in enumerate(scan.ranges):
             if not math.isfinite(d):
@@ -125,7 +124,7 @@ class WallFollower(Node):
                 RIGHT.append(d)
             elif -160 <= ang < -110:
                 BACK_RIGHT.append(d)
-            elif 20 < ang <= 70:    # Afegim visió Front-Esquerra
+            elif 20 < ang <= 70:      # <--- NEW LOGIC ADDED
                 FR_LEFT.append(d)
 
         # Minimal distances
@@ -133,13 +132,13 @@ class WallFollower(Node):
         min_fr_right   = min(FR_RIGHT)   if FR_RIGHT   else float('inf')
         min_right      = min(RIGHT)      if RIGHT      else float('inf')
         min_back_right = min(BACK_RIGHT) if BACK_RIGHT else float('inf')
-        min_fr_left    = min(FR_LEFT)    if FR_LEFT    else float('inf')
+        min_fr_left    = min(FR_LEFT)    if FR_LEFT    else float('inf') # <--- NEW CALC
 
         twist = Twist()
         action = ""
 
         #----------------------------------------------------------
-        # RULE 1: FRONT obstacle → turn left (Emergència frontal)
+        # RULE 1: FRONT obstacle → turn left
         #----------------------------------------------------------
         if min_front < self.base_distance:
             twist.linear.x = 0.0
@@ -148,7 +147,7 @@ class WallFollower(Node):
             action = f"FRONT {min_front:.2f} m → turn LEFT"
 
         #----------------------------------------------------------
-        # RULE 2: FRONT-RIGHT obstacle → slow + turn left
+        # RULE 2: FRONT-RIGHT obstacle → slow + left
         #----------------------------------------------------------
         elif min_fr_right < self.base_distance:
             twist.linear.x = 0.0
@@ -157,8 +156,7 @@ class WallFollower(Node):
             action = f"FRONT-RIGHT {min_fr_right:.2f} m → turn LEFT"
 
         #----------------------------------------------------------
-        # NOVE RULE: FRONT-LEFT obstacle → turn right 
-        # (Si xoquem per l'esquerra, girem cap a la paret dreta)
+        # NEW RULE: FRONT-LEFT obstacle → turn right
         #----------------------------------------------------------
         elif min_fr_left < self.base_distance:
             twist.linear.x = 0.0
@@ -167,9 +165,11 @@ class WallFollower(Node):
             action = f"FRONT-LEFT {min_fr_left:.2f} m → turn RIGHT"
 
         #----------------------------------------------------------
-        # RULE 3: RIGHT visible → control with tolerance band
+        # RULE 3: RIGHT visible → control with tolerance band (no vy)
+        # ADDED THRESHOLD: Only follow if wall is closer than 1.2m
         #----------------------------------------------------------
-        elif math.isfinite(min_right):
+        elif math.isfinite(min_right) and min_right < 1.2:
+            # error > 0 → too far; error < 0 → too close
             error = min_right - self.base_distance
 
             if abs(error) <= self.tol:
@@ -177,50 +177,66 @@ class WallFollower(Node):
                 twist.linear.x = self.v_lin
                 twist.linear.y = 0.0
                 twist.angular.z = 0.0
-                action = f"RIGHT OK ({min_right:.2f}m) → STRAIGHT"
+                action = (
+                    f"RIGHT ~OK ({min_right:.2f} m, target "
+                    f"{self.base_distance:.2f}±{self.tol:.2f}) → STRAIGHT"
+                )
 
             elif error < 0:
-                # Too close (més a prop del target) → Girem Esquerra
+                # Too close to right wall → slow forward + stronger left turn
                 twist.linear.x = self.v_lin * 0.5
                 twist.linear.y = 0.0
-                twist.angular.z = self.v_ang 
-                action = f"RIGHT CLOSE ({min_right:.2f}m) → Turn LEFT"
+                twist.angular.z = self.v_ang * 2.0
+                action = (
+                    f"RIGHT too CLOSE ({min_right:.2f} m < "
+                    f"{self.base_distance:.2f}-{self.tol:.2f}) → "
+                    f"forward + strong LEFT turn"
+                )
 
             else:
-                # Too far (més lluny del target) → Girem Dreta
+                # Too far from right wall → slow forward + stronger right turn
                 twist.linear.x = self.v_lin * 0.5
                 twist.linear.y = 0.0
-                twist.angular.z = -self.v_ang * 2
-                action = f"RIGHT FAR ({min_right:.2f}m) → Turn RIGHT"
+                twist.angular.z = -self.v_ang * 2.0
+                action = (
+                    f"RIGHT too FAR ({min_right:.2f} m > "
+                    f"{self.base_distance:.2f}+{self.tol:.2f}) → "
+                    f"forward + strong RIGHT turn"
+                )
 
         #----------------------------------------------------------
-        # RULE 4: BACK-RIGHT → Si perdem la paret lateral, però la veiem al darrere
+        # RULE 4: BACK-RIGHT → only if it is the most relevant wall
         #----------------------------------------------------------
-        elif math.isfinite(min_back_right):
-            twist.linear.x = self.v_lin * 0.5
+        elif math.isfinite(min_back_right) and (
+            not math.isfinite(min_right) or min_back_right <= min_right
+        ) and min_back_right < 1.2:
+            twist.linear.x = self.v_lin * 0.1
             twist.linear.y = 0.0
-            twist.angular.z = -self.v_ang * 1.5
-            action = f"BACK-RIGHT {min_back_right:.2f} m → Pivot RIGHT"
+            twist.angular.z = -2.0 * self.v_ang
+            action = (
+                f"BACK-RIGHT {min_back_right:.2f} m → "
+                f"very slow + STRONG RIGHT turn (2*w)"
+            )
 
         #----------------------------------------------------------
-        # NOVA RULE: LOST → Si no veiem res, busquem la paret
+        # NEW RULE 5: LOST → Search for wall
         #----------------------------------------------------------
         else:
-            # Avancem i girem molt suaument a la dreta per trobar paret
-            twist.linear.x = self.v_lin 
+            # Move straight to find a wall
+            twist.linear.x = self.v_lin
             twist.linear.y = 0.0
-            twist.angular.z = -self.v_ang * 0.3
-            action = "LOST (No wall) → Search (Arc Right)"
+            twist.angular.z = 0.0
+            action = "LOST (No wall < 1.2m) → SEARCH STRAIGHT"
 
-        # Update last commanded twist
+        # Update last commanded twist (periodic timer will publish it)
         self.cmd = twist
 
-        # Logging
+        # Logging (only on change)
         if action != self._last_action_logged:
-            self.get_logger().info(action if action else "Stopped.")
+            self.get_logger().info(action if action else "No action (stopped).")
             self._last_action_logged = action
 
-        self._state_action = action if action else "Stopped"
+        self._state_action = action if action else "Stopped (no wall detected)"
 
     #--------------------------------------------------------------------
     def log_info(self):
