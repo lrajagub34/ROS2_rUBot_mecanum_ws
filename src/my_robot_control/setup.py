@@ -34,7 +34,8 @@ setup(
             'custom_rubot_lidar_test_exec = my_robot_control.custom_rubot_lidar_test:main',
             'my_robot_selfcontrol_holonomic_exec = my_robot_control.my_robot_selfcontrol_holonomic:main',
             'my_robot_wallfollower_holonomic_exec = my_robot_control.my_robot_wallfollower_holonomic:main',
-            'custom_robot_collision_exec = my_robot_control.custom_robot_collision:main'
+            'custom_robot_collision_exec = my_robot_control.custom_robot_collision:main',
+            'my_robot_wallfollower_holonomic_exec_2 = my_robot_control.my_robot_wallfollower_holonomic_2:main'
         ],
     },
 
