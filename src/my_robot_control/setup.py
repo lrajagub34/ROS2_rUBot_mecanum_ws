@@ -36,7 +36,10 @@ setup(
             'my_robot_wallfollower_holonomic_exec = my_robot_control.my_robot_wallfollower_holonomic:main',
             'custom_robot_collision_exec = my_robot_control.custom_robot_collision:main',
             'my_robot_wallfollower_holonomic_exec_2 = my_robot_control.my_robot_wallfollower_holonomic_2:main',
-            'custom_robot_wallfollower_differential_exec = my_robot_control.my_robot_wallfollower_differential:main'],
+            'custom_robot_wallfollower_differential_exec = my_robot_control.my_robot_wallfollower_differential:main',
+            'my_robot_wallfollower_holonomic_exec_3 = my_robot_control.my_robot_wallfollower_holonomic_3:main',],
+        
+        
     },
 
 )
