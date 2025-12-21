@@ -16,7 +16,6 @@
   <depend>tf_transformations</depend>
   <depend>cv_bridge</depend>
   <depend>tf2_ros</depend>
-  <depend>vision_msgs</depend>
   <depend>custom_msgs</depend>
 
   <test_depend>ament_copyright</test_depend>
